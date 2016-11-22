@@ -18,9 +18,11 @@ We follow this [stackoverflow thread](http://askubuntu.com/questions/635265/how-
 
 3. Symlink the version of Spark to a spark directory 
 
-`ln -s /srv/spark-2.0.2 /srv/spark`
+    ``` ln -s /srv/spark-2.0.2 /srv/spark```
+    
 
 4. Edit your ~/.bashrc (or .bash_profile) and add Spark to your PATH, along with setting the SPARK_HOME environment vairable :
+    
     ```
     export SPARK_HOME=/srv/spark
     export PATH=$SPARK_HOME/bin:$PATH
@@ -28,9 +30,13 @@ We follow this [stackoverflow thread](http://askubuntu.com/questions/635265/how-
     
 #### Importing pyspark in a python script
 Now in order to import pyspark into a python script, you need to follow these last steps.
+
 1. Install FindSpark, because PySpark isn't on sys.path by default.
+
   `pip install findspark`
+  
 2. Write and run a python script with the following lines to add PySpark to your sys.path
+
   ```
     import findspark
     findspark.init('/srv/spark')
