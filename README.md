@@ -43,3 +43,29 @@ Now in order to import pyspark into a python script, you need to follow these la
   ```
 
 You should now be able to do `import pyspark` :)
+
+### 2. pywFM 
+
+We used [pywFM](https://github.com/jfloff/pywFM), a python wrapper for the [libFM](http://libfm.org/) library, which was originally written in C++. This is a **Factorization Machine** library, which implements :
+- Stochastic Gradient Descent (SGD),
+- Adaptive Stochastic Gradient Descent (SGDA),
+- Alternating Least Squares (ALS) with user and item bias,
+- Markov Chain Monte Carlo (MCMC).
+
+#### Installing libFM and pywFM
+
+1. First you have to clone and compile `libFM` repository, and then set an environment variable to the `libFM` bin folder
+
+```
+git clone https://github.com/srendle/libfm /home/libfm
+cd /home/libfm/ && make all
+export LIBFM_PATH=/home/libfm/bin/
+```
+
+2. Then, you simply install `pywFM` with `pip`
+
+```
+pip install pywFM
+```
+
+And then `pywFM` should run from your computer !
