@@ -1,6 +1,8 @@
 import numpy as np
 from cost import *
 from predictionAlgorithms import *
+from helpers import df_load, df_to_sparse
+import pywFM
 
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold."""
@@ -46,7 +48,7 @@ def cross_validation_demo(data):
     #cross_validation_visualization(lambdas, rmse_tr, rmse_te)
 
 def cross_validationALS(data, k_indices, k, rank, lambda_, numIterations):
-    """return the loss of ridge regression."""
+    """return the loss of Alternating Least Squares with Regularisation."""
     # get k'th subgroup in test, others in train
     te_indice = k_indices[k]
     tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
@@ -65,27 +67,161 @@ def cross_validationALS(data, k_indices, k, rank, lambda_, numIterations):
     #loss_tr = np.sqrt(2 * compute_mse(y_tr, tx_tr, w))
     loss_te = compute_cost(predictions._3.values, test.Prediction.values)
     return loss_te
+
+
+def cross_validationALSBias_demo():
+    """
+        Full example of cross validation using the ALS with Bias method from pywFM. 
+        It returns the best parameters after performing a grid search on the data we're giving.
+        /!\ It takes a very long time to run, do not give too much parameters at a time /!\
+    """
+
+    # 1. Setting the lists of values on which we're doing the grid search as well as general parameters
+    num_iter = 40; k_fold = 4
+    std_init_vec=[0.43]; rank_vec=[7]; r0_reg_vec=[0.5]; r1_reg_vec=[15,20]; r2_reg_vec=[20,25]
     
-def cross_validation(y, x, k_indices, k, lambda_, degree):
-    """return the loss of ridge regression."""
+    # 2. Loading the data and preparing the run.
+    df = df_load("data_train.csv")
+    k_indices = build_k_indices(df['Prediction'], k_fold, 12)
+
+    rmse_te = np.zeros((len(std_init_vec) , len(rank_vec), len(r0_reg_vec),len(r1_reg_vec),len(r2_reg_vec)))    
+    best_rmse = 1000000; best_std = 0; best_rank = 0;
+    best_r0 = 0; best_r1 = 0; best_r2 = 0;
+    
+    print("\t\tStarting the ",k_fold,"-fold cross validation for ALS with bias\n")
+    # 3. Cross-Validation (Hurray for the 6 for loops !)
+    for i, std_init in enumerate(std_init_vec):
+        for j, rank in enumerate(rank_vec):
+            for k, r0_reg in enumerate(r0_reg_vec):
+                for l, r1_reg in enumerate(r1_reg_vec):
+                    for m, r2_reg in enumerate(r2_reg_vec):
+                        rmse_te_tmp = []      
+                    
+                        for k_cv in range(0,k_fold):
+                            rmse_te_tmp.append(cross_validationALSBias(df, k_indices, k_cv,
+                                    num_iter , std_init, rank, r0_reg, r1_reg, r2_reg))
+                        
+                        mean_rmse = np.mean(rmse_te_tmp)    
+                        print("RMSE = ", mean_rmse," (", num_iter, "iterations, std_init =",
+                                std_init, ", k=", rank, ", r0_reg=", r0_reg,
+                                ", r1_reg=", r1_reg,", r2_reg =", r2_reg,")")
+    
+                        if mean_rmse < best_rmse:
+                            best_rmse = mean_rmse; best_std = std_init; 
+                            best_rank = rank; best_r0 = r0_reg; best_r1 = r1_reg; best_r2 = r2_reg;   
+                    
+                        rmse_te[i][j][k][l][m] = mean_rmse
+
+    return best_rmse, best_std, best_rank, best_r0, best_r1, best_r2  
+
+
+def cross_validationALSBias(data, k_indices, k, num_iter, std_init, rank, r0_reg, r1_reg,r2_reg):
+    """
+        Runs the cross validation on the input data, using the ALS algorithm with the user bias included. 
+        It splits the data into a training and testing fold, according to k_indices and k, and then runs 
+        the ALS with bias on all the parameters (std_init, rank, r0_reg, r1_reg, r2_reg) for num_iter iterations.
+        @param data : the DataFrame containing all our training data (on which we do the CV)
+        @param k_indices : array of k-lists containing each of the splits of the data
+        @param k : the number of folds of the cross-validation
+        @param num_iter : the number of iterations of the algorithm
+        @param std_init : the standard deviation for the initialisation of W and Z
+        @param rank : the number of columns of W and Z
+        @param r0_reg : the regularization parameter for the global bias term w0
+        @param r1_reg : the regularization parameter of the user/item bias term w
+        @param r2_reg : the regularization parameter for the ALS regularization (size of the entries of W and Z)
+        @return loss_te : the RMSE loss for the run of the algorithm using libFM with these parameters.
+        
+    """
     # get k'th subgroup in test, others in train
-    te_indice = k_indices[k]
-    tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
-    tr_indice = tr_indice.reshape(-1)
-    y_te = y[te_indice]
-    y_tr = y[tr_indice]
-    x_te = x[te_indice]
-    x_tr = x[tr_indice]
-    # form data with polynomial degree
-    tx_tr = build_poly(x_tr, degree)
-    tx_te = build_poly(x_te, degree)
-    # ridge regression
-    w = ridge_regression(y_tr, tx_tr, lambda_)
-    predictions = ALSPyspark(x_tr, x_te, rank, lambda_, numIterations)
-    # calculate the loss for train and test data
-    loss_tr = np.sqrt(2 * compute_mse(y_tr, tx_tr, w))
-    loss_te = np.sqrt(2 * compute_mse(y_te, tx_te, w))
-    return loss_tr, loss_te
+    te_indices = k_indices[k]
+    tr_indices = k_indices[~(np.arange(k_indices.shape[0]) == k)]
+    tr_indices = tr_indices.reshape(-1)
+    
+    train = data.loc[tr_indices]
+    test = data.loc[te_indices]
+    test.sort_values(['Movie', 'User'], ascending=[1,1], inplace=True)
+
+    # format the DataFrames into the Sparse matrices we need to run with pywFM
+    features_tr, target_tr =  df_to_sparse(train)
+    features_te, target_te = df_to_sparse(test)
+
+    # running the model
+    fm = pywFM.FM(task = 'regression', learning_method='als', num_iter=num_iter, init_stdev = std_init,
+                  k2 = rank, r0_regularization = r0_reg, r1_regularization = r1_reg, r2_regularization = r2_reg)
+    
+    model = fm.run(features_tr, target_tr, features_te, target_te)
+    
+    # getting the RMSE at the last run step.
+    loss_te = model.rlog.rmse[num_iter-1]
+                          
+    return loss_te
+
+
+def cross_validationMCMC_demo():
+    
+    # 1. Setting the lists of values on which we're doing the grid search as well as general parameters
+    num_iter = 20; k_fold = 4
+    std_init_vec=[0.375, 0.4, 0.45, 0.5];
+
+    # 2. Loading the data and preparing the run.
+    df = df_load("data_train.csv")
+    k_indices = build_k_indices(df['Prediction'], k_fold, 12)
+
+    best_rmse = 1000000;
+    best_std = 0;
+    
+    rmse_te = []
+    
+    print("\t\tStarting the ",k_fold,"-fold cross validation for MCMC\n")
+    for std_init in std_init_vec:
+        rmse_te_tmp = []      
+        for k_cv in range(0,k_fold):
+            rmse_te_tmp.append(cross_validationMCMC(df, k_indices, k_cv, num_iter , std_init))
+                        
+        mean_rmse = np.mean(rmse_te_tmp)    
+        print("RMSE = ", mean_rmse," (for MCMC with with ", num_iter, "iterations, std_init =", std_init,")")
+    
+        if mean_rmse < best_rmse:
+            best_rmse = mean_rmse; best_std = std_init;                     
+        rmse_te.append(mean_rmse)
+        
+    return best_rmse, best_std
+
+def cross_validationMCMC(data, k_indices, k, num_iter, std_init):
+    """
+        Runs the cross validation on the input data, using the Markov Chain Monte Carlo algorithm. 
+        It splits the data into a training and testing fold, according to k_indices and k, and then runs 
+        the MCMC on all the parameter std_init for num_iter iterations.
+        @param data : the DataFrame containing all our training data (on which we do the CV)
+        @param k_indices : array of k-lists containing each of the splits of the data
+        @param k : the number of folds of the cross-validation
+        @param num_iter : the number of iterations of the algorithm
+        @param std_init : the standard deviation for the initialisation of the data
+        @return loss_te : the RMSE loss for the run of the algorithm using libFM with these parameters.
+        
+    """
+    # get k'th subgroup in test, others in train
+    te_indices = k_indices[k]
+    tr_indices = k_indices[~(np.arange(k_indices.shape[0]) == k)]
+    tr_indices = tr_indices.reshape(-1)
+    
+    train = data.loc[tr_indices]
+    test = data.loc[te_indices]
+    test.sort_values(['Movie', 'User'], ascending=[1,1], inplace=True)
+
+    # format the DataFrames into the Sparse matrices we need to run with pywFM
+    features_tr, target_tr =  df_to_sparse(train)
+    features_te, target_te = df_to_sparse(test)
+
+    # running the model
+    fm = pywFM.FM(task='regression', num_iter= num_iter,init_stdev = std_init)
+    
+    model = fm.run(features_tr, target_tr, features_te, target_te)
+    
+    # getting the RMSE at the last run step.
+    loss_te = model.rlog.rmse[num_iter-1]
+                          
+    return loss_te
 
 def optimize_weights(predictions1, predictions2, predictions3, labels):
     resolution = 50
