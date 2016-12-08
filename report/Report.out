@@ -1,0 +1,14 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Data Description}{}% 2
+\BOOKMARK [1][-]{section.3}{Results}{}% 3
+\BOOKMARK [2][-]{subsubsection.3.0.1}{User Mean}{section.3}% 4
+\BOOKMARK [3][-]{subsubsection.3.0.2}{Item Mean}{subsubsection.3.0.1}% 5
+\BOOKMARK [3][-]{subsubsection.3.0.3}{Alternating Least Squares \(ALS\)}{subsubsection.3.0.1}% 6
+\BOOKMARK [3][-]{subsubsection.3.0.4}{Alternating Least Squares with Regularization}{subsubsection.3.0.1}% 7
+\BOOKMARK [3][-]{subsubsection.3.0.5}{ALS with biases}{subsubsection.3.0.1}% 8
+\BOOKMARK [3][-]{subsubsection.3.0.6}{Markov Chain Monte Carlo \(MCMC\)}{subsubsection.3.0.1}% 9
+\BOOKMARK [2][-]{subsection.3.1}{Best results : Combinating all the Results}{section.3}% 10
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Combinating the Results}{subsection.3.1}% 11
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Details of the results}{subsection.3.1}% 12
+\BOOKMARK [1][-]{section.4}{Conclusion}{}% 13
+\BOOKMARK [1][-]{section*.1}{References}{}% 14
