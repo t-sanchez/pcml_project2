@@ -6,14 +6,14 @@ from itertools import groupby
 import numpy as np
 import scipy.sparse as sp
 import pandas as pd
+from scipy.sparse import csr_matrix
 
 
 def read_txt(path):
     """read text file from path."""
     with open(path, "r") as f:
-        return f.read().splitlines()
-
-
+        return f.read().splitlines()    
+    
 def load_data(path_dataset):
     """Load data in text format, one rating per line, as in the kaggle competition."""
     data = read_txt(path_dataset)[1:]
@@ -95,6 +95,68 @@ def realDataSets():
     testDF['Movie'] = values_test[0]
     
     return trainDF, testDF
+
+
+def df_load(path):
+    """
+       Loads and orders the data from a path in the way we'll need, especially using libFM's algorithms.
+    """
+    # 1. Load the DF and format it
+    df = pd.read_csv(path)
+    df['User'] = [(ID.split('_')[0])[1:] for ID in df['Id']]
+    df['Movie'] = [(ID.split('_')[1])[1:] for ID in df['Id']]
+    df[['User', 'Movie', 'Prediction']] = df[['User', 'Movie', 'Prediction']].astype(int)
+
+    # 2. Sort in ascending way for two variables so we can identify it later on.
+    df = df.sort_values(['Movie','User'],ascending=[True,True])
+    return df
+
+def df_to_sparse(df):
+    """
+        Rewrites our matrix of user movie association in the following format, starting from a 2 column csv file with :
+        1st column : user id and movie id mixed, 2nd column : rating. The output matrix will take the form 
+        
+         Users  |     Movies    
+        A  B  C | TI  NH  SW  ST
+        [1, 0, 0,  1,  0,  0,  0],
+        [1, 0, 0,  0,  1,  0,  0],
+        [1, 0, 0,  0,  0,  1,  0],
+        [0, 1, 0,  0,  0,  1,  0],
+        [0, 1, 0,  0,  0,  0,  1],
+        [0, 0, 1,  1,  0,  0,  0],
+        [0, 0, 1,  0,  0,  1,  0] 
+        ])
+        
+        target = [5, 3, 1, 4, 5, 1, 5]
+        
+        @param path : The path of the training/testing data
+        @return features, target : the corresponding matrix and target values
+    """
+    
+    #1. Extracting the info from the input DF
+    user_index = np.squeeze(np.array(df['User']-1))
+    movie_index = np.squeeze(np.array(df['Movie'] + max(user_index)))
+    ratings = np.squeeze(np.array(df['Prediction']))
+    
+    #2.Formatting now the way we need to use libFM
+
+    col_entries = np.r_[user_index,movie_index]
+    indices = np.arange(0,len(user_index))
+    row_entries = np.r_[indices,indices]
+    entries = np.ones(len(row_entries))
+    
+    features = csr_matrix((entries,(row_entries, col_entries)),shape = (len(indices),len(col_entries)))
+    
+    return features, ratings
+
+def write_submission(submission_data_path, prediction, out_path):
+    """
+        Given a submission_data_path (contains the data we loaded on the testing set), the corresponding predictions 
+        from the algorithm and the out_path, formats and saves the result to the out_path.
+    """
+    df = df_load(submission_data_path)
+    df['Prediction'] = prediction.astype(int)
+    df[['Id','Prediction']].to_csv(out_path, index = False)
 
 def cross_vad(y,ratio) :
     n = y.shape[0]
