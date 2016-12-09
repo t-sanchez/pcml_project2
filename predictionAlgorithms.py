@@ -57,7 +57,7 @@ def ALSPysparkMe(train, test, rank, lambda_, numIterations):
     predictions_df = predictionsTest.toDF()
     predictions_pd = predictions_df.toPandas()
     predictions_pd.columns = ['User', 'Movie', 'Prediction']
-    predictions_pd.sort_values(['User','Movie'], ascending=[1,1], inplace=True)
+    predictions_pd.sort_values(['Movie','User'], ascending=[1,1], inplace=True)
     return predictions_pd
 
 
@@ -74,11 +74,11 @@ def ALSPyspark(train, test, rank, lambda_, numIterations):
     lol = s.toPandas()
     lol.sort_values(['_1','_2'],ascending=[1,1],inplace=True)
     predic_end = lol.reset_index(drop=True)
-    test.Movie = test.Movie.values.astype(int)
-    test.User = test.User.values.astype(int)
-    new_test = test.sort_values(by=['Movie','User'],ascending=[True,True])
-    test_end = new_test.reset_index(drop=True)
-    test_end.head()
+    #test.Movie = test.Movie.values.astype(int)
+    #test.User = test.User.values.astype(int)
+    #new_test = test.sort_values(by=['User','Movie'],ascending=[True,True])
+    #test_end = new_test.reset_index(drop=True)
+    #test_end.head()
     
     return predic_end
 
@@ -110,7 +110,7 @@ def ALSBias_pywFM(train, test, num_iter=100, std_init = 0.43, rank = 7, r0_reg =
     # 4. Outputs
     pred = model.predictions
     
-    return pred
+    return np.array(pred)
 
 def MCMC_pywFM(train, test, num_iter=100, std_init = 0.5):
     
@@ -127,4 +127,4 @@ def MCMC_pywFM(train, test, num_iter=100, std_init = 0.5):
     # 4. Outputs
     pred = model.predictions
     
-    return pred
+    return np.array(pred)

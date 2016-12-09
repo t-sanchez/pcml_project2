@@ -223,22 +223,35 @@ def cross_validationMCMC(data, k_indices, k, num_iter, std_init):
                           
     return loss_te
 
-def optimize_weights(predictions1, predictions2, predictions3, labels):
+def optimize_weights(predictions1, predictions2, predictions3, predictions4, predictions5, labels):
     resolution = 50
     cost_best = 10
+    w1List = np.linspace(0,0.2,5)
+    w2List = np.linspace(0,0.2,5)
+    w3List = np.linspace(0,0.5,10)
+    w4List = np.linspace(0,1,10)
+    #w5List = np.linspace(0,1,10)
     w1_best = 0
     w2_best = 0
     w3_best = 0
-    for w1 in np.linspace(0,1,resolution):
-        for w2 in np.linspace(0,1-w1,resolution*(1-w1)):
-            w3 = 1-w1-w2
-            predictions = w1*predictions1 + w2*predictions2 + w3*predictions3
-            c = compute_cost(predictions, labels)
-            #print("w1 = {w1}, w2 = {w2}, w3 = {w3} : loss = {l}".format(w1=w1, w2=w2, w3=w3, l=c))
-            if c < cost_best:
-                w1_best = w1
-                w2_best = w2
-                w3_best = w3
-                cost_best = c
-    return w1_best, w2_best, w3_best, cost_best
+    w4_best = 0
+    w5_best = 0
+    
+    for w1 in w1List:
+        for w2 in w2List:
+            for w3 in w3List:
+                for w4 in w4List:
+                    if w1 + w2 + w3 + w4 <= 1:
+                        w5 = 1 - (w1 + w2 + w3 + w4)
+                        predictions = w1*predictions1 + w2*predictions2 + w3*predictions3 + w4*predictions4 + w5*predictions5
+                        c = compute_cost(predictions, labels)
+                        #print("w1 = {w1}, w2 = {w2}, w3 = {w3} : loss = {l}".format(w1=w1, w2=w2, w3=w3, l=c))
+                        if c < cost_best:
+                            w1_best = w1
+                            w2_best = w2
+                            w3_best = w3
+                            w4_best = w4
+                            w5_best = w5
+                            cost_best = c
+    return w1_best, w2_best, w3_best, w4_best, w5_best, cost_best
     

@@ -97,20 +97,6 @@ def realDataSets():
     return trainDF, testDF
 
 
-def df_load(path):
-    """
-       Loads and orders the data from a path in the way we'll need, especially using libFM's algorithms.
-    """
-    # 1. Load the DF and format it
-    df = pd.read_csv(path)
-    df['User'] = [(ID.split('_')[0])[1:] for ID in df['Id']]
-    df['Movie'] = [(ID.split('_')[1])[1:] for ID in df['Id']]
-    df[['User', 'Movie', 'Prediction']] = df[['User', 'Movie', 'Prediction']].astype(int)
-
-    # 2. Sort in ascending way for two variables so we can identify it later on.
-    df = df.sort_values(['Movie','User'],ascending=[True,True])
-    return df
-
 def df_to_sparse(df):
     """
         Rewrites our matrix of user movie association in the following format, starting from a 2 column csv file with :
@@ -134,10 +120,12 @@ def df_to_sparse(df):
     """
     
     #1. Extracting the info from the input DF
-    user_index = np.squeeze(np.array(df['User']-1))
+    user_index = np.squeeze(np.array(df['User']))
     movie_index = np.squeeze(np.array(df['Movie'] + max(user_index)))
-    ratings = np.squeeze(np.array(df['Prediction']))
-    
+    if 'Prediction' in df.columns:
+        ratings = np.squeeze(np.array(df['Prediction']))
+    else:
+        ratings = np.zeros(df['Movie'].shape)
     #2.Formatting now the way we need to use libFM
 
     col_entries = np.r_[user_index,movie_index]
