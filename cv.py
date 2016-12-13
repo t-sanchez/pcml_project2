@@ -69,7 +69,7 @@ def cross_validationALS(data, k_indices, k, rank, lambda_, numIterations):
     return loss_te
 
 
-def cross_validationALSBias_demo():
+def cross_validationALSBias_demo(data):
     """
         Full example of cross validation using the ALS with Bias method from pywFM. 
         It returns the best parameters after performing a grid search on the data we're giving.
@@ -81,7 +81,7 @@ def cross_validationALSBias_demo():
     std_init_vec=[0.43]; rank_vec=[7]; r0_reg_vec=[0.5]; r1_reg_vec=[15,20]; r2_reg_vec=[20,25]
     
     # 2. Loading the data and preparing the run.
-    df = df_load("data_train.csv")
+    df = data
     k_indices = build_k_indices(df['Prediction'], k_fold, 12)
 
     rmse_te = np.zeros((len(std_init_vec) , len(rank_vec), len(r0_reg_vec),len(r1_reg_vec),len(r2_reg_vec)))    
@@ -157,14 +157,14 @@ def cross_validationALSBias(data, k_indices, k, num_iter, std_init, rank, r0_reg
     return loss_te
 
 
-def cross_validationMCMC_demo():
+def cross_validationMCMC_demo(data):
     
     # 1. Setting the lists of values on which we're doing the grid search as well as general parameters
     num_iter = 20; k_fold = 4
     std_init_vec=[0.375, 0.4, 0.45, 0.5];
 
     # 2. Loading the data and preparing the run.
-    df = df_load("data_train.csv")
+    df = data
     k_indices = build_k_indices(df['Prediction'], k_fold, 12)
 
     best_rmse = 1000000;
