@@ -25,8 +25,9 @@ def baseline_user_mean(values_train, values_test):
     
     ratePerUser = np.zeros(len(np.unique(users))) # mean rate per user (over all movies)
     for i,user in enumerate(np.unique(users)):
+        # ratePerUser[i] : mean rate given by user 'user' 
         ratePerUser[i] = np.mean(rates[users == user])
-        # ratePerUser[i] = mean rate given by user 'user' 
+        
 
     return ratePerUser[users_test]
 
@@ -43,9 +44,45 @@ def baseline_item_mean(values_train, values_test):
     
     ratePerMovie = np.zeros(len(np.unique(items))) # mean rate of each movie (over all users)
     for i,item in enumerate(np.unique(items)):
+        # ratePerMovie[i] = mean rate given by to item 'item' 
         ratePerMovie[i] = np.mean(rates[items == item])
     
     return ratePerMovie[items_test]
+
+# Returns the predicted labels of test set using user mean of train set
+def baseline_user_median(values_train, values_test):
+    """baseline method: use the user means as the prediction."""    
+    items = values_train['Movie']
+    users = values_train['User']
+    rates = values_train['Prediction']
+    
+    items_test = values_test['Movie']
+    users_test = values_test['User']
+    
+    ratePerUser = np.zeros(len(np.unique(users))) # mean rate per user (over all movies)
+    for i,user in enumerate(np.unique(users)):
+        ratePerUser[i] = np.median(rates[users == user])
+        # ratePerUser[i] = mean rate given by user 'user' 
+
+    return ratePerUser[users_test]
+
+
+# Returns the predicted labels of test set using item mean of train set
+def baseline_item_median(values_train, values_test):
+    """baseline method: use item means as the prediction."""
+    items = values_train['Movie']
+    users = values_train['User']
+    rates = values_train['Prediction']
+    
+    items_test = values_test['Movie']
+    users_test = values_test['User']
+    
+    ratePerMovie = np.zeros(len(np.unique(items))) # mean rate of each movie (over all users)
+    for i,item in enumerate(np.unique(items)):
+        ratePerMovie[i] = np.mean(rates[items == item])
+    
+    return ratePerMovie[items_test]
+
 
 def ALSPysparkMe(train, test, rank, lambda_, numIterations):
     train_sdf = sql_sc.createDataFrame(train)
@@ -80,7 +117,7 @@ def ALSPyspark(train, test, rank, lambda_, numIterations):
     #test_end = new_test.reset_index(drop=True)
     #test_end.head()
     
-    return predic_end
+    return predic_end._3.values
 
 def ALSBias_pywFM(train, test, num_iter=100, std_init = 0.43, rank = 7, r0_reg = 0.5, r1_reg = 15, r2_reg = 25):
     """

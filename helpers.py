@@ -149,7 +149,7 @@ def write_submission(submission_data_path, prediction, out_path):
 def cross_vad(y,ratio) :
     n = y.shape[0]
     interval = int(n *ratio)
-    seed = 3
+    seed = 1
     np.random.seed(seed)
     index = np.random.permutation(n)
     k_train = index[0:interval]
