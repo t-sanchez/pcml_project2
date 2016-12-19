@@ -4,7 +4,7 @@ Here are our implementations of the Recommender Systems project, described more 
 ## Files
 
 ### 1. Notebooks (.ipynb)
-- **DataExploration.ipynb : ** performs a simple first data exploration, in order to visualise how the rates are distributed per user, as well as per movie.
+- **DataExploration.ipynb :** performs a simple first data exploration, in order to visualise how the rates are distributed per user, as well as per movie.
 - **MixAlgorithms.ipynb :** the main simulation file, in which all the methods are called with the best parameters (hardcoded), the results blended and the best prediction saved.
 
 ### 2. Python files (.py)
