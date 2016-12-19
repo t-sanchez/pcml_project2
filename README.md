@@ -1,6 +1,21 @@
 # PCML - Project 2 : Recommender System
 
 Here are our implementations of the Recommender Systems project, described more extensively on [kaggle](https://inclass.kaggle.com/c/epfml-rec-sys). 
+## Files
+
+### 1. Notebooks (.ipynb)
+- **DataExploration.ipynb : ** performs a simple first data exploration, in order to visualise how the rates are distributed per user, as well as per movie.
+- **MixAlgorithms.ipynb :** the main simulation file, in which all the methods are called with the best parameters (hardcoded), the results blended and the best prediction saved.
+
+### 2. Python files (.py)
+
+- **cost.py :** Standard RMSE cost function 
+- **cv.py :** For each of the method, contains a *crossvalidation* function, which returns only the loss for a given input of parameters, as well as a *demo* function, which given data, return the best parameters chosen from the ones set in the function itself. There is another function, namely *optimize_weights*, which, given the prediction from the 5 methods as well as the reference labels, that returns the best combinaion of weights.
+- **helpers.py :** helper functions, mostly for writing/reading from files, or formatting data the way we need.
+- **plots.py :** various plots to visualise our data
+- **predictionAlgorithms.py :** very important function, the one that actually does prediction. Given a set of parameters for a method as well as a training and a testing set, returns the vector of predictions for the testing set.
+
+
 
 ## Libraries 
 ### 1. PySpark
