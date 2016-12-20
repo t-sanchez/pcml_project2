@@ -3,9 +3,11 @@
 Here are our implementations of the Recommender Systems project, described more extensively on [kaggle](https://inclass.kaggle.com/c/epfml-rec-sys). 
 ## Files
 
+### 1. Python scripts
+- **run.py :** loads the training and testing datasets, trains all the 5 algorithms separately, and performs the predictions on the testing set. Then the blending is applied to the predictions, and the final prediction is saved in the file *submission.csv*.
+
 ### 1. Notebooks (.ipynb)
 - **DataExploration.ipynb :** performs a simple first data exploration, in order to visualise how the rates are distributed per user, as well as per movie.
-- **MixAlgorithms.ipynb :** the main simulation file, in which all the methods are called with the best parameters (hardcoded), the results blended and the best prediction saved.
 
 ### 2. Python files (.py)
 

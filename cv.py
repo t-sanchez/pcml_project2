@@ -1,7 +1,7 @@
 import numpy as np
 from cost import *
 from predictionAlgorithms import *
-from helpers import df_load, df_to_sparse
+from helpers import df_to_sparse
 import pywFM
 
 def build_k_indices(y, k_fold, seed):
@@ -61,11 +61,9 @@ def cross_validationALS(data, k_indices, k, rank, lambda_, numIterations):
     
     # ALS
     predictions = ALSPyspark(train, test, rank, lambda_, numIterations)
-    print(predictions.head())
-    print(test.head())
     # calculate the loss for train and test data
     #loss_tr = np.sqrt(2 * compute_mse(y_tr, tx_tr, w))
-    loss_te = compute_cost(predictions._3.values, test.Prediction.values)
+    loss_te = compute_cost(predictions, test.Prediction.values)
     return loss_te
 
 
@@ -226,10 +224,10 @@ def cross_validationMCMC(data, k_indices, k, num_iter, std_init):
 def optimize_weights(predictions1, predictions2, predictions3, predictions4, predictions5, labels):
     resolution = 50
     cost_best = 10
-    w1List = np.linspace(0,0.2,5)
-    w2List = np.linspace(0,0.2,5)
-    w3List = np.linspace(0,0.5,10)
-    w4List = np.linspace(0,1,10)
+    w1List = np.linspace(0,0.2,10)
+    w2List = np.linspace(0,0.2,10)
+    w3List = np.linspace(0,0.5,20)
+    w4List = np.linspace(0,1,20)
     #w5List = np.linspace(0,1,10)
     w1_best = 0
     w2_best = 0

@@ -39,7 +39,7 @@ def preprocess_data(data):
 
     # do statistics on the dataset.
     min_row, max_row, min_col, max_col = statistics(data)
-    print("number of items: {}, number of users: {}".format(max_row, max_col))
+    #print("number of items: {}, number of users: {}".format(max_row, max_col))
 
     # build rating matrix.
     ratings = sp.lil_matrix((max_row, max_col))

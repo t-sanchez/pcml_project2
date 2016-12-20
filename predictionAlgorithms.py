@@ -13,6 +13,8 @@ from pyspark.mllib.recommendation import ALS, MatrixFactorizationModel, Rating
 from helpers import df_to_sparse
 import pywFM
 
+# Every algorithms are implemented in this file, and can all be used in a the same way. Each of them take as parameters the set on which the algorithm is trained, and the set to which the algorithm is applied for predictions. For the algorithm which have some parameters, the optimal ones are set by default, but can be modified by passing them as parameters of the function.
+
 # Returns the predicted labels of test set using user mean of train set
 def baseline_user_mean(values_train, values_test):
     """baseline method: use the user means as the prediction."""    
@@ -83,22 +85,7 @@ def baseline_item_median(values_train, values_test):
     
     return ratePerMovie[items_test]
 
-
-def ALSPysparkMe(train, test, rank, lambda_, numIterations):
-    train_sdf = sql_sc.createDataFrame(train)
-    
-    model = ALS.train(train_sdf.rdd, rank, numIterations, lambda_)
-    
-    test_sdf = sql_sc.createDataFrame(test[['User', 'Movie']])
-    predictionsTest = model.predictAll(test_sdf.rdd)
-    predictions_df = predictionsTest.toDF()
-    predictions_pd = predictions_df.toPandas()
-    predictions_pd.columns = ['User', 'Movie', 'Prediction']
-    predictions_pd.sort_values(['Movie','User'], ascending=[1,1], inplace=True)
-    return predictions_pd
-
-
-def ALSPyspark(train, test, rank, lambda_, numIterations):
+def ALSPyspark(train, test, rank = 8, lambda_ = 0.081, numIterations = 20):
     pDF = sql_sc.createDataFrame(train)
     spDF = pDF.rdd
     model = ALS.train(spDF, rank, numIterations,lambda_)
@@ -111,11 +98,6 @@ def ALSPyspark(train, test, rank, lambda_, numIterations):
     lol = s.toPandas()
     lol.sort_values(['_1','_2'],ascending=[1,1],inplace=True)
     predic_end = lol.reset_index(drop=True)
-    #test.Movie = test.Movie.values.astype(int)
-    #test.User = test.User.values.astype(int)
-    #new_test = test.sort_values(by=['User','Movie'],ascending=[True,True])
-    #test_end = new_test.reset_index(drop=True)
-    #test_end.head()
     
     return predic_end._3.values
 
