@@ -94,9 +94,7 @@ We used [pywFM](https://github.com/jfloff/pywFM), a python wrapper for the [libF
 
 3. Then, you simply install `pywFM` with `pip`
    
-    ```
-    pip install pywFM
-    ```
+    `pip install pywFM`
     
 And then `pywFM` should run from your computer !
 
@@ -107,6 +105,4 @@ We used this quite standard library, but mention it for completeness. This comes
 ### 4. (Optional) 
 After having installed everything, reload your ~/.bashrc to make sure that the changes are taken into account
     
-    ```
     source ~/.bashrc
-    ```
