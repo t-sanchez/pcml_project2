@@ -13,7 +13,7 @@ def build_k_indices(y, k_fold, seed):
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return np.array(k_indices)
 
-def cross_validation_demo(data):
+def cross_validationALS_demo(data):
     seed = 1
     k_fold = 4
     numIterations = 20
@@ -59,10 +59,12 @@ def cross_validationALS(data, k_indices, k, rank, lambda_, numIterations):
     print("train : {s} elements".format(s = train.shape[0]))
     print("test : {s} elements".format(s = test.shape[0]))
     
-    # ALS
+    print(test.shape[0])
+    # Train ALS model
     predictions = ALSPyspark(train, test, rank, lambda_, numIterations)
+    print(len(predictions))
+    
     # calculate the loss for train and test data
-    #loss_tr = np.sqrt(2 * compute_mse(y_tr, tx_tr, w))
     loss_te = compute_cost(predictions, test.Prediction.values)
     return loss_te
 
