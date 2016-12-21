@@ -105,4 +105,4 @@ We used this quite standard library, but mention it for completeness. This comes
 ### 4. (Optional) 
 After having installed everything, reload your ~/.bashrc to make sure that the changes are taken into account
     
-    `source ~/.bashrc`
+    source ~/.bashrc
