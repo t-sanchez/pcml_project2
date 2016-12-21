@@ -76,6 +76,9 @@ def calculate_mse(real_label, prediction):
     return 1.0 * t.dot(t.T) / len(t)
 
 def make_submission(predictions):
+    """
+    Exports the submission to the csv file
+    """
     sampleSubmission = pd.read_csv('sampleSubmission.csv')
     sampleSubmission['Prediction'] = predictions
     sampleSubmission.to_csv('submission.csv', index = False)

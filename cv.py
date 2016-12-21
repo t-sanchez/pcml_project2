@@ -14,57 +14,61 @@ def build_k_indices(y, k_fold, seed):
     return np.array(k_indices)
 
 def cross_validationALS_demo(data):
+    """
+       Performs cross-validation on the input data, given the parameters defined just below.
+       The only loop is done on the lambdas, which are the regularisation parameters for the ALS.
+       At each iteration, the function cross_validationALS is called, and returns the error for the
+       particular lambda we considered.
+    """
+    # 1. Parameters
     seed = 1
     k_fold = 4
     numIterations = 20
     rank = 6
     lambdas = np.linspace(0.07, 0.08, 3)
-    # split data in k fold
+    # 2. Split data in k fold
     k_indices = build_k_indices(data, k_fold, seed)
     # define lists to store the loss of training data and test data
-    #rmse_tr = []
-    mse_te = []
+    rmse_te = []
     best_lambda = lambdas[0]
-    best_mse = 10
+    best_rmse = 10
     # cross validation
     print("{k}-fold cross validation".format(k = k_fold))
     for lambda_ in lambdas:
-        #rmse_tr_tmp = []
-        mse_te_tmp = []
+        rmse_te_tmp = []
         print("lambda = {l}".format(l=lambda_))
         for k in range(k_fold):
             loss_te = cross_validationALS(data, k_indices, k, rank, lambda_, numIterations)
             print("k = {k} : loss = {l}".format(k=k, l = loss_te))
-            #rmse_tr_tmp.append(loss_tr)
-            mse_te_tmp.append(loss_te)
-        #rmse_tr.append(np.mean(rmse_tr_tmp))
-        mean_mse = np.mean(mse_te_tmp)
-        print(mse_te_tmp)
-        print("lambda = {l} : mse = {m}".format(l = lambda_, m = mean_mse))
-        if mean_mse < best_mse:
+            rmse_te_tmp.append(loss_te)
+        mean_rmse = np.mean(rmse_te_tmp)
+        print(rmse_te_tmp)
+        print("lambda = {l} : rmse = {m}".format(l = lambda_, m = mean_rmse))
+        if mean_rmse < best_rmse:
             best_lambda = lambda_
-        mse_te.append(mean_mse)
-    return best_lambda, best_mse
-    #cross_validation_visualization(lambdas, rmse_tr, rmse_te)
+        rmse_te.append(mean_rmse)
+    return best_lambda, best_rmse
 
 def cross_validationALS(data, k_indices, k, rank, lambda_, numIterations):
     """return the loss of Alternating Least Squares with Regularisation."""
-    # get k'th subgroup in test, others in train
+    # 1. get k'th subgroup in test, others in train
     te_indice = k_indices[k]
     tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
     tr_indice = tr_indice.reshape(-1)
     train = data.loc[tr_indice]
     test = data.loc[te_indice]
+    
+    # 2. Format the values in the testing set before giving them to the algorithm.
     test.sort_values(['User', 'Movie'], ascending=[1,1], inplace=True)
     print("train : {s} elements".format(s = train.shape[0]))
     print("test : {s} elements".format(s = test.shape[0]))
     
     print(test.shape[0])
-    # Train ALS model
+    # 3. Train ALS model
     predictions = ALSPyspark(train, test, rank, lambda_, numIterations)
     print(len(predictions))
     
-    # calculate the loss for train and test data
+    # 4. Calculate the loss for train and test data
     loss_te = compute_cost(predictions, test.Prediction.values)
     return loss_te
 
