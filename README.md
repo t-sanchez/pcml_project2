@@ -100,11 +100,11 @@ We used [pywFM](https://github.com/jfloff/pywFM), a python wrapper for the [libF
     
 And then `pywFM` should run from your computer !
 
-### 2. pandas
+### 3. pandas
 We used this quite standard library, but mention it for completeness. This comes by default while installing Anaconda.
 
 
-### (Optional) 
+### 4. (Optional) 
 After having installed everything, reload your ~/.bashrc to make sure that the changes are taken into account
     
     ```
