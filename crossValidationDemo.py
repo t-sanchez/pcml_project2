@@ -20,7 +20,3 @@ print("Best std : {std}, best rank : {r}, best r0 : {r0}, best r1 : {r1}, best r
 print("Cross validation MCMC")
 best_rmse, best_std = cross_validationALS_demo(df)
 print("Best std : {std}".format(std = best_std))
-
-print("Cross validation ALS")
-best_lambda, best_rank, best_mse = cross_validationALS_demo(df)
-print("Best lambda : {l}, best rank : {r}".format(l = best_lambda, r = best_rank))
