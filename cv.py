@@ -245,7 +245,6 @@ def optimize_weights(predictions1, predictions2, predictions3, predictions4, pre
                         w5 = 1 - (w1 + w2 + w3 + w4)
                         predictions = w1*predictions1 + w2*predictions2 + w3*predictions3 + w4*predictions4 + w5*predictions5
                         c = compute_cost(predictions, labels)
-                        #print("w1 = {w1}, w2 = {w2}, w3 = {w3} : loss = {l}".format(w1=w1, w2=w2, w3=w3, l=c))
                         if c < cost_best:
                             w1_best = w1
                             w2_best = w2
