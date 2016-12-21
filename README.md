@@ -73,16 +73,27 @@ We used [pywFM](https://github.com/jfloff/pywFM), a python wrapper for the [libF
 
 1. First you have to clone and compile `libFM` repository, and then set an environment variable to the `libFM` bin folder
 
-```
-git clone https://github.com/srendle/libfm /home/libfm
-cd /home/libfm/ && make all
-export LIBFM_PATH=/home/libfm/bin/
-```
+    ```
+    git clone https://github.com/srendle/libfm /home/libfm
+    cd /home/libfm/ && make all
+    ```
 
-2. Then, you simply install `pywFM` with `pip`
+2. Edit your ~/.bashrc (or .bash_profile) and add libFM to your path
+    
+    ```
+    export LIBFM_PATH=/home/libfm/bin/
+    ```
 
-```
-pip install pywFM
-```
+3. Then, you simply install `pywFM` with `pip`
+   
+    ```
+    pip install pywFM
+    ```
 
+4. Finally, after having installed everything, reload your ~/.bashrc to make sure that the changes are taken into account
+    
+    ```
+    source ~/.bashrc
+    ```
+    
 And then `pywFM` should run from your computer !
