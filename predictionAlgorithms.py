@@ -19,10 +19,10 @@ import pywFM
 def baseline_user_mean(values_train, values_test):
     """
         baseline method: use user means as the prediction.
-        @param train : the DataFrame containing all our training data.
-        @param test : the DataFrame containing all our testing data.
+        @param values_train : the DataFrame containing all our training data.
+        @param values_test : the DataFrame containing all our testing data.
         
-        @return loss_te : the prediction values for all the data within the test set
+        @return ratePerUser[users_test] : the prediction values for all the data within the test set
     """ 
     items = values_train['Movie']
     users = values_train['User']
@@ -44,10 +44,10 @@ def baseline_user_mean(values_train, values_test):
 def baseline_item_mean(values_train, values_test):
     """
         baseline method: use item means as the prediction.
-        @param train : the DataFrame containing all our training data.
-        @param test : the DataFrame containing all our testing data.
+        @param values_train : the DataFrame containing all our training data.
+        @param values_test : the DataFrame containing all our testing data.
         
-        @return loss_te : the prediction values for all the data within the test set
+        @return ratePerMovie[items_test] : the prediction values for all the data within the test set
     """
     items = values_train['Movie']
     users = values_train['User']
@@ -67,13 +67,15 @@ def baseline_item_mean(values_train, values_test):
 def ALSPyspark(train, test, rank = 8, lambda_ = 0.081, numIterations = 20):
     """
         Runs the ALS algorithm without the user bias.
+        N.B. The parameters passed by default are the best ones we found.
+
         @param train : the DataFrame containing all our training data.
         @param test : the DataFrame containing all our testing data.
         @param rank : the number of columns of W and Z
-        @param lamnda_ : the regularization parameter for the ALS regularization (size of the entries of W and Z)
+        @param lambda_ : the regularization parameter for the ALS regularization (size of the entries of W and Z)
         @param num_iter : the number of iterations of the algorithm
         
-        @return loss_te : the prediction values for all the data within the test set
+        @return predic_end._3.values : the prediction values for all the data within the test set
         
     """
     # 1. Format the data into RDD for Spark
@@ -100,6 +102,8 @@ def ALSPyspark(train, test, rank = 8, lambda_ = 0.081, numIterations = 20):
 def ALSBias_pywFM(train, test, num_iter=100, std_init = 0.43, rank = 7, r0_reg = 0.5, r1_reg = 15, r2_reg = 25):
     """
         Runs the ALS algorithm with the user bias included for num_iter iterations.
+        N.B. The parameters passed by default are the best ones we found.
+        
         @param train : the DataFrame containing all our training data.
         @param test : the DataFrame containing all our testing data.
         @param num_iter : the number of iterations of the algorithm
@@ -108,7 +112,7 @@ def ALSBias_pywFM(train, test, num_iter=100, std_init = 0.43, rank = 7, r0_reg =
         @param r0_reg : the regularization parameter for the global bias term w0
         @param r1_reg : the regularization parameter of the user/item bias term w
         @param r2_reg : the regularization parameter for the ALS regularization (size of the entries of W and Z)
-        @return loss_te : the prediction values for all the data within the test set
+        @return np.array(pred) : the prediction values for all the data within the test set
         
     """
     # 1. Defining the model
@@ -130,12 +134,14 @@ def ALSBias_pywFM(train, test, num_iter=100, std_init = 0.43, rank = 7, r0_reg =
 def MCMC_pywFM(train, test, num_iter=100, std_init = 0.5):
     """
         Runs the ALS algorithm with MCMC for num_iter iterations.
+        N.B. The parameters passed by default are the best ones we found.
+
         @param train : the DataFrame containing all our training data.
         @param test : the DataFrame containing all our testing data.
         @param num_iter : the number of iterations of the algorithm
         @param std_init : the standard deviation for the initialisation of W and Z
 
-        @return loss_te : the prediction values for all the data within the test set
+        @return np.array(pred) : the prediction values for all the data within the test set
         
     """
     

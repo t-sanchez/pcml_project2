@@ -5,8 +5,8 @@ Here are our implementations of the Recommender Systems project, described more 
 
 ### 1. Python scripts
 - **run.py :** loads the training and testing datasets, trains all the 5 algorithms separately, and performs the predictions on the testing set. Then the blending is applied to the predictions, and the final prediction is saved in the file *submission.csv*. Note that `pySpark` produces a lot of warnings during a run bcause it is intended to be run on multiple cores which is not the case here, but still runs correctly here, so you do not need to worry about it.
-- **crossValidationDemo.py :** loads the training datasets, runs the three cross validation demo functions that are in `cv.py` and prints the optimal parameters (i.e. the ones we want to use).
-- **weightsOptimization.py :** loads the training dataset, trains the 5 algorithms on 70% of the daa, and optimizes the weights for each algorithm in order to minimize the error on the remaining part of the training set. The optimisation is performed using a grid search on possible values of the weights.
+- **run_crossValidation.py :** loads the training datasets, runs the three cross validation demo functions that are in `cv.py` and prints the optimal parameters (i.e. the ones we want to use).
+- **run_weightsOptimization.py :** loads the training dataset, trains the 5 algorithms on 70% of the daa, and optimizes the weights for each algorithm in order to minimize the error on the remaining part of the training set. The optimisation is performed using a grid search on possible values of the weights.
 
 ### 2. Notebook (.ipynb)
 - **DataExploration.ipynb :** performs a simple first data exploration, in order to visualise how the rates are distributed per user, as well as per movie.

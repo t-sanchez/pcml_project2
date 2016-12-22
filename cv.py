@@ -228,6 +228,14 @@ def cross_validationMCMC(data, k_indices, k, num_iter, std_init):
     return loss_te
 
 def optimize_weights(predictions1, predictions2, predictions3, predictions4, predictions5, labels):
+    """
+    Performs a grid search on the list of weights given below to find the combination of predictions from our algorithm that minimizes
+    the error on the labels given.
+    @param predictions1-5 : the predictions from our methods (User Mean, Item Mean, ALS, ALS with bias, MCMC)
+    @param labels: the actual correct value for those predictions.
+    @return w1-5_best : the best combination of weights that minimizes the RMSE.
+    @return cost_best : the minimal RMSE.
+    """
     resolution = 50
     cost_best = 10
     w1List = np.linspace(0,0.2,10)

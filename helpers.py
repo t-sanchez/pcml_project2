@@ -71,19 +71,34 @@ def build_index_groups(train):
 
 
 def calculate_mse(real_label, prediction):
-    """calculate MSE."""
+    """
+    Computes MSE.
+    @param real_label : the target labels we want to predict (typically from a split of training set or multiple-fold cross validation)
+    @param prediction : the prediction of the algorithm on those labels.
+    
+    """
     t = real_label - prediction
     return 1.0 * t.dot(t.T) / len(t)
 
 def make_submission(predictions):
     """
-    Exports the submission to the csv file
+    Exports the submission to the csv file.
+    @param predictions : the vector of predictions for the "sampleSubmission.csv" file. 
+            N.B. It needs to be correctly reordered in order for the prediction fo actually work.
     """
     sampleSubmission = pd.read_csv('sampleSubmission.csv')
     sampleSubmission['Prediction'] = predictions
     sampleSubmission.to_csv('submission.csv', index = False)
     
 def realDataSets():
+    """
+    Loads the training and testing data set, formats it, and returns two formatted dataframes
+    @return train_df : returns the formatted DataFrame taken from "data_train.csv"
+    @return test_df : returns the formatted DataFrame taken from "sampleSubmission.csv" (the ratings are not correct here,
+    as these are the ones we need to predict).
+    """
+    
+    #Loading the training Dataset
     path_dataset = "data_train.csv"
     train = load_data(path_dataset)
     values_train = sp.find(train)
@@ -91,6 +106,7 @@ def realDataSets():
     trainDF['Movie'] = values_train[0]
     trainDF['Prediction'] = values_train[2]
     
+    #Loading the submission Dataset
     path_dataset = "sampleSubmission.csv"
     test = load_data(path_dataset)
     values_test = sp.find(test)
@@ -144,12 +160,23 @@ def write_submission(submission_data_path, prediction, out_path):
     """
         Given a submission_data_path (contains the data we loaded on the testing set), the corresponding predictions 
         from the algorithm and the out_path, formats and saves the result to the out_path.
+        @param submission_data_path: the name of the data file which contains the data we want to do prediction on.
+        @param prediction : the prediction for those data.
+        @param out_path : the path to which we export the results.
     """
     df = df_load(submission_data_path)
     df['Prediction'] = prediction.astype(int)
     df[['Id','Prediction']].to_csv(out_path, index = False)
 
+    
 def cross_vad(y,ratio) :
+    """
+    Given a DataFrame y and a ratio ratio, returns the indices of the splitting ratio%-train,(1-ratio)%-test.
+    @param y: a DataFrame containing the training data.
+    @param ratio : the ratio of training elements we want after the split.
+    @return k_train : the shuffled indices for our training set.
+    @return k_test : the suffled indices for our tetsting set.
+    """
     n = y.shape[0]
     interval = int(n *ratio)
     seed = 1
@@ -160,6 +187,12 @@ def cross_vad(y,ratio) :
     return k_train , k_test
 
 def crossValidationSets(p):
+    """
+        Loads the training set and splits it into two train and test sets, given a ratio p. 
+        It uses cross_vad to find the indices we need to get a partition p% of train, (1-p)% of test
+        @param p : the percentage of elements that we want in the training split (has to be between 0 and 1)
+        @return the train split and the test split.
+    """
     path_dataset = "data_train.csv"
     train = load_data(path_dataset)
     values_train = sp.find(train)
